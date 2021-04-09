@@ -1,24 +1,44 @@
-import logo from './logo.svg';
+import React, {useEffect, useState} from "react";
+
+import "leaflet/dist/leaflet.css";
 import './App.css';
 
+import { MapContext } from "./Contexts/Map";
+import Form from "./components/Form";
+import Map from "./components/Map";
+
 function App() {
+  const startsPosition = { lat: -22.76160, lng: -43.416031 };
+
+  const [deliveries, setDeliveries] = useState([]);
+  const [position, setPosition] = useState(null);
+  const [location, setLocation] = useState(startsPosition);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(position => {
+      setLocation({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      });
+    });
+  }, []);
+
+  let value = {
+    location,
+    setLocation,
+    position,
+    setPosition,
+    deliveries,
+    setDeliveries,
+  };
+
+  if(!location) return "Loading...";
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <MapContext.Provider value={value}>
+      <Form />
+      <Map />
+    </MapContext.Provider>
   );
 }
 
